@@ -1,0 +1,1 @@
+vsim tb.etb -t 1ps -suppress 8684 -do "run -all" -c
