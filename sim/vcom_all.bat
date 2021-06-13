@@ -28,8 +28,6 @@ vcom -O5 -2008 -quiet -work sim/swan ^
 ../rtl/dpram.vhd ^
 ../rtl/registerpackage.vhd ^
 ../rtl/reg_swan.vhd ^
-../rtl/SyncRamDual.vhd ^
-../rtl/SyncFifoFallThrough.vhd ^
 ../rtl/bus_savestates.vhd ^
 ../rtl/reg_savestates.vhd ^
 ../rtl/statemanager.vhd ^

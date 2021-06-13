@@ -70,4 +70,5 @@ Attention: Rewind capture will slow down your game by about 0.5% and may lead to
 Rewind capture is not compatible to "Pause when OSD is open", so pause is disabled when Rewind capture is on.
 
 # Missing features
-All Multiplayer/Internet features
+- All Multiplayer/Internet features
+- Internal EEPROM (Name, Birthdate) not saved to SDCard

@@ -195,7 +195,7 @@ assign AUDIO_MIX = status[8:7];
 // 0         1         2         3          4         5         6
 // 01234567890123456789012345678901 23456789012345678901234567890123
 // 0123456789ABCDEFGHIJKLMNOPQRSTUV 0123456789ABCDEFGHIJKLMNOPQRSTUV
-// xxxxxxxxxxxx xx xxxxxxxxxxxxxxxx   xxxxxxxxxxx
+// xxxxxxxxxxxxxxx xxxxxxxxxxxxxxxx   xxxxxxxxxxx
 
 `include "build_id.v" 
 localparam CONF_STR = {
@@ -214,6 +214,7 @@ localparam CONF_STR = {
 	"h0RT,Restore state (F1);",
 	"-;",
 	"OAB,Orientation,Horz,Vert,Vert180,Auto;",
+	"OC,Flipped Horz,Off,On;",
 	"OGJ,CRT H-Sync Adjust,0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,-2,-1;",
 	"OKN,CRT V-Sync Adjust,0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,-2,-1;",
 	"ODE,Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
@@ -720,9 +721,14 @@ always @(posedge CLK_VIDEO) begin
 	if(ce_pix) begin
 
       if (videomode == 0) begin
-         if(vbl) px_addr <= 0;
-         else begin 
-            if(!hbl) px_addr <= px_addr + 1'd1;
+         if(vbl) begin
+            if (status[12]) px_addr <= 32255;
+            else            px_addr <= 0;
+         end else begin 
+            if(!hbl) begin
+               if (status[12]) px_addr <= px_addr - 1'd1;
+               else            px_addr <= px_addr + 1'd1;
+            end
          end
       end else if (videomode == 1) begin
          if(!hbl) begin 

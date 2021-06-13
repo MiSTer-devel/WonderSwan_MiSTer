@@ -139,28 +139,21 @@ begin
             tileActive <= '0';
 
             -- window check
-            if (unsigned(WinX0) > unsigned(WinX1) and WindowOutside = '1') then
-               wX0 <= unsigned(WinX1);
-               wX1 <= unsigned(WinX0);
-            else
-               wX0 <= unsigned(WinX0);
-               wX1 <= unsigned(WinX1);
-            end if;
-            
-            if (unsigned(WinY0) > unsigned(WinY1) and WindowOutside = '1') then
-               wY0 <= unsigned(WinY1);
-               wY1 <= unsigned(WinY0);
-            else
-               wY0 <= unsigned(WinY0);
-               wY1 <= unsigned(WinY1);
-            end if;
+            wX0 <= unsigned(WinX0);
+            wX1 <= unsigned(WinX1);
+            wY0 <= unsigned(WinY0);
+            wY1 <= unsigned(WinY1);
             
             windowAllow <= '1';
-            if (wxCheck >= wX0 and wxCheck <= wX1 and unsigned(lineY) >= wY0 and unsigned(lineY) <= wY1) then -- inside
-               if (useWindow = '1' and WindowOutside = '1') then
-                  windowAllow <= '0';
+            if ((wxCheck >= wX0 and wxCheck <= wX1) or (wxCheck >= wX1 and wxCheck <= wX0)) then -- inside
+               if ((unsigned(lineY) >= wY0 and unsigned(lineY) <= wY1) or (unsigned(lineY) >= wY1 and unsigned(lineY) <= wY0)) then 
+                  if (useWindow = '1' and WindowOutside = '1') then
+                     windowAllow <= '0';
+                  end if;
                end if;
-            else
+            end if;
+            
+            if (wxCheck < wX0 or wxCheck > wX1 or unsigned(lineY) < wY0 or unsigned(lineY) > wY1) then -- outside
                if (useWindow = '1' and WindowOutside = '0') then
                   windowAllow <= '0';
                end if;

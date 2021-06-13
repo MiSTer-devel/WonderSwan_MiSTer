@@ -67,6 +67,7 @@ architecture arch of sprites is
    signal wX1             : unsigned(7 downto 0) := (others => '0');
    signal wY1             : unsigned(7 downto 0) := (others => '0');
    signal windowInside    : std_logic := '0';
+   signal windowOutside   : std_logic := '0';
    
    signal wxCheck         : unsigned(7 downto 0) := (others => '0');
 
@@ -96,27 +97,22 @@ begin
          if (ce = '1') then
          
             -- window check
-            --if (unsigned(WinX0) > unsigned(WinX1)) then
-            --   wX0 <= unsigned(WinX1);
-            --   wX1 <= unsigned(WinX0);
-            --else
-               wX0 <= unsigned(WinX0);
-               wX1 <= unsigned(WinX1);
-            --end if;
-            
-            --if (unsigned(WinY0) > unsigned(WinY1)) then
-            --   wY0 <= unsigned(WinY1);
-            --   wY1 <= unsigned(WinY0);
-            --else
-               wY0 <= unsigned(WinY0);
-               wY1 <= unsigned(WinY1);
-            --end if;
+            wX0 <= unsigned(WinX0);
+            wX1 <= unsigned(WinX1);
+            wY0 <= unsigned(WinY0);
+            wY1 <= unsigned(WinY1);
             
             windowInside <= '0';
-            if (wxCheck >= wX0 and wxCheck <= wX1 and unsigned(lineY) >= wY0 and unsigned(lineY) <= wY1) then -- inside
-               windowInside <= '1';
+            if ((wxCheck >= wX0 and wxCheck <= wX1) or (wxCheck >= wX1 and wxCheck <= wX0)) then -- inside
+               if ((unsigned(lineY) >= wY0 and unsigned(lineY) <= wY1) or (unsigned(lineY) >= wY1 and unsigned(lineY) <= wY0)) then 
+                  windowInside <= '1';
+               end if;
             end if;
-         
+            
+            windowOutside <= '0';
+            if (wxCheck < wX0 or wxCheck > wX1 or unsigned(lineY) < wY0 or unsigned(lineY) > wY1) then -- outside
+               windowOutside <= '1';
+            end if;
          
             if (startLine = '1' and enable = '1') then
             
@@ -183,7 +179,7 @@ begin
                      if (spritesActive(i) = '1') then
                         if ((posX - spriteSettings(i).xPos) < 8) then
                            if (spriteSettings(i).tileColorNext /= x"0" or (depth2 = '1' and spriteSettings(i).palette(2) = '0')) then
-                              if (useWindow = '0' or windowInside /= spriteSettings(i).windowClip) then
+                              if (useWindow = '0' or (windowInside = '0' and spriteSettings(i).windowClip = '1') or (windowOutside = '0' and spriteSettings(i).windowClip = '0')) then
                                  spriteActiveCnt <= i;
                                  spriteActiveOn  <='1';
                               end if;
