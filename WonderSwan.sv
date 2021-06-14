@@ -200,9 +200,9 @@ assign AUDIO_MIX = status[8:7];
 `include "build_id.v" 
 localparam CONF_STR = {
 	"WonderSwan;SS3E000000:100000;",
-	"FS1,WSCWS ,Load ROM;",
+	"FS1,WSCWS PC2,Load ROM;",
 	"-;",
-	"o78,System,Auto,WonderSwan,SwanColor;",
+	"o78,System,Auto,WonderSwan,SwanColor,PocketChallengeV2;",
 	"-;",
 	"d0r9,Reload Backup RAM;",
 	"d0rA,Save Backup RAM;",
@@ -363,7 +363,7 @@ wire cart_wr;
 reg cart_ready = 0;
 reg ioctl_wr_1 = 0;
 
-wire cart_download = ioctl_download && (filetype == 8'h01 || filetype == 8'h41 || filetype == 8'h80);
+wire cart_download = ioctl_download && (filetype[5:0] == 6'h01 || filetype == 8'h80);
 wire colorcart_download = ioctl_download && (filetype == 8'h01);
 wire bios_download = ioctl_download && (filetype == 8'h00 || filetype == 8'h40);
 
@@ -467,7 +467,7 @@ always @(posedge clk_sys) begin
 	end
 end
 
-wire isColor = (status[40:39] == 0) ? (lastdata[4][8] | colorcart_downloaded) : status[40]; 
+wire isColor = (status[40:39] == 0) ? (lastdata[4][8] | colorcart_downloaded) : (status[40:39] == 2'b01);
 
 reg [79:0] time_dout = 41'd0;
 wire [79:0] time_din;
