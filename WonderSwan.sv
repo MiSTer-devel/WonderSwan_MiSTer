@@ -467,7 +467,7 @@ always @(posedge clk_sys) begin
 	end
 end
 
-wire isColor = (status[40:39] == 0) ? (lastdata[4][8] | colorcart_downloaded) : (status[40:39] == 2'b01);
+wire isColor = (status[40:39] == 0) ? (lastdata[4][8] | colorcart_downloaded) : (status[40:39] == 2'b10);
 
 reg [79:0] time_dout = 41'd0;
 wire [79:0] time_din;
