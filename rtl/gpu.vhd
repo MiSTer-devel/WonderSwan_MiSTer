@@ -189,13 +189,16 @@ architecture arch of gpu is
    signal tileActive_BG0      : std_logic;
    signal tileActive_BG1      : std_logic;
    signal tileActive_SPR      : std_logic;
+   signal tileActive_SPR2     : std_logic;
    signal tilePrio_SPR        : std_logic;
    signal tilePalette_BG0     : std_logic_vector(3 downto 0);
    signal tilePalette_BG1     : std_logic_vector(3 downto 0);
    signal tilePalette_SPR     : std_logic_vector(3 downto 0);
+   signal tilePalette_SPR2    : std_logic_vector(3 downto 0);
    signal tileColor_BG0       : std_logic_vector(3 downto 0);   
    signal tileColor_BG1       : std_logic_vector(3 downto 0);   
    signal tileColor_SPR       : std_logic_vector(3 downto 0);   
+   signal tileColor_SPR2      : std_logic_vector(3 downto 0);   
    
    -- Color Mixing
    signal paletteColor        : std_logic_vector(2 downto 0) := (others => '0');
@@ -693,15 +696,20 @@ begin
       tileActive     => tileActive_SPR,
       tilePrio       => tilePrio_SPR,
       tilePalette    => tilePalette_SPR, 
-      tileColor      => tileColor_SPR    
+      tileColor      => tileColor_SPR,
+      
+      tileActive2    => tileActive_SPR2,
+      tilePalette2   => tilePalette_SPR2, 
+      tileColor2     => tileColor_SPR2 
    );
    
    
    -- data merge
    process (clk)
-      variable output_bg0 : std_logic;
-      variable output_bg1 : std_logic;
-      variable output_spr : std_logic;
+      variable output_bg0  : std_logic;
+      variable output_bg1  : std_logic;
+      variable output_spr  : std_logic;
+      variable output_spr2 : std_logic;
    begin
       if rising_edge(clk) then
       
@@ -720,15 +728,16 @@ begin
                pixel_out_we   <= '1';
             end if;
             
-            output_bg0 := '0';           
-            output_bg1 := '0';
-            output_spr := '0';
+            output_bg0  := '0';           
+            output_bg1  := '0';
+            output_spr  := '0';
+            output_spr2 := '0';
 
-            if (tileActive_BG0 = '1' and (tileColor_BG0 /= x"0" or (depth2 = '1' and tilePalette_BG0(2) = '0'))) then output_bg0 := '1'; end if;
-            if (tileActive_BG1 = '1' and (tileColor_BG1 /= x"0" or (depth2 = '1' and tilePalette_BG1(2) = '0'))) then output_bg1 := '1'; end if;
-            if (tileActive_SPR = '1' and (tileColor_SPR /= x"0" or (depth2 = '1' and tilePalette_SPR(2) = '0'))) then output_spr := '1'; end if;
-           
-               
+            if (tileActive_BG0  = '1' and (tileColor_BG0  /= x"0" or (depth2 = '1' and tilePalette_BG0(2)  = '0'))) then output_bg0  := '1'; end if;
+            if (tileActive_BG1  = '1' and (tileColor_BG1  /= x"0" or (depth2 = '1' and tilePalette_BG1(2)  = '0'))) then output_bg1  := '1'; end if;
+            if (tileActive_SPR  = '1' and (tileColor_SPR  /= x"0" or (depth2 = '1' and tilePalette_SPR(2)  = '0'))) then output_spr  := '1'; end if;
+            if (tileActive_SPR2 = '1' and (tileColor_SPR2 /= x"0" or (depth2 = '1' and tilePalette_SPR2(2) = '0'))) then output_spr2 := '1'; end if;
+            
             if (isGray = '1') then
             
                if (output_spr = '1' and (tilePrio_SPR = '1' or output_bg1 = '0')) then
@@ -737,6 +746,14 @@ begin
                      when "01" => paletteColor <= Palette(to_integer(unsigned(tilePalette_SPR)) * 2 + 0)(6 downto 4);
                      when "10" => paletteColor <= Palette(to_integer(unsigned(tilePalette_SPR)) * 2 + 1)(2 downto 0);
                      when "11" => paletteColor <= Palette(to_integer(unsigned(tilePalette_SPR)) * 2 + 1)(6 downto 4);
+                     when others => null;
+                  end case;
+               elsif (output_spr2 = '1') then
+                  case (tileColor_SPR2(1 downto 0)) is
+                     when "00" => paletteColor <= Palette(to_integer(unsigned(tilePalette_SPR2)) * 2 + 0)(2 downto 0);
+                     when "01" => paletteColor <= Palette(to_integer(unsigned(tilePalette_SPR2)) * 2 + 0)(6 downto 4);
+                     when "10" => paletteColor <= Palette(to_integer(unsigned(tilePalette_SPR2)) * 2 + 1)(2 downto 0);
+                     when "11" => paletteColor <= Palette(to_integer(unsigned(tilePalette_SPR2)) * 2 + 1)(6 downto 4);
                      when others => null;
                   end case;
                elsif (output_bg1 = '1') then

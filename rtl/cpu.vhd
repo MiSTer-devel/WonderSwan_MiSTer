@@ -2706,10 +2706,10 @@ begin
                               opstep     <= 1;
                               DIVstart   <= '1';
                               if (opsize = 1) then
-                                 DIVdividend <= resize(signed(regs.reg_ax(7 downto 0)), 33);
+                                 DIVdividend <= resize(signed(regs.reg_ax), 33);
                                  DIVdivisor  <= resize(signed(memFetchValue2(7 downto 0)), 33);
                               else
-                                 DIVdividend <= resize(signed(regs.reg_ax), 33);
+                                 DIVdividend <= resize(signed(regs.reg_dx & regs.reg_ax), 33);
                                  DIVdivisor  <= resize(signed(memFetchValue2), 33);
                               end if;
                            elsif (ce = '1') then

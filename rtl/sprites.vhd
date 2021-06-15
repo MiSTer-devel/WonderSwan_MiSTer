@@ -30,7 +30,11 @@ entity sprites is
       tileActive     : out std_logic := '0';
       tilePrio       : out std_logic := '0';
       tilePalette    : out std_logic_vector(3 downto 0) := (others => '0');
-      tileColor      : out std_logic_vector(3 downto 0) := (others => '0')
+      tileColor      : out std_logic_vector(3 downto 0) := (others => '0');
+      
+      tileActive2    : out std_logic := '0';
+      tilePalette2   : out std_logic_vector(3 downto 0) := (others => '0');
+      tileColor2     : out std_logic_vector(3 downto 0) := (others => '0')
    );
 end entity;
 
@@ -59,7 +63,10 @@ architecture arch of sprites is
    signal pixelCount         : integer range 0 to 255;
 
    signal spriteActiveOn     : std_logic := '0';
-   signal spriteActiveCnt    : integer range 0 to 31;
+   signal spriteActiveCnt    : integer range 0 to 31;   
+   
+   signal spriteActiveOn2    : std_logic := '0';
+   signal spriteActiveCnt2   : integer range 0 to 31;
    
    -- window
    signal wX0             : unsigned(7 downto 0) := (others => '0');
@@ -129,7 +136,8 @@ begin
                   posX       <= posX + 1;
                   wxCheck    <= wxCheck + 1;
             
-                  spriteActiveOn  <= '0';
+                  spriteActiveOn   <= '0';
+                  spriteActiveOn2  <= '0';
                   for i in 31 downto 0 loop
                   
                      tileX8 := (posX + 1) - spriteSettings(i).xPos;
@@ -186,6 +194,18 @@ begin
                            end if;
                         end if;
                      end if;
+                     
+                     -- find active sprite with high prio set
+                     if (spritesActive(i) = '1' and spriteSettings(i).Scr2Prio = '1') then
+                        if ((posX - spriteSettings(i).xPos) < 8) then
+                           if (spriteSettings(i).tileColorNext /= x"0" or (depth2 = '1' and spriteSettings(i).palette(2) = '0')) then
+                              if (useWindow = '0' or (windowInside = '0' and spriteSettings(i).windowClip = '1') or (windowOutside = '0' and spriteSettings(i).windowClip = '0')) then
+                                 spriteActiveCnt2 <= i;
+                                 spriteActiveOn2  <='1';
+                              end if;
+                           end if;
+                        end if;
+                     end if;
                   end loop;
                   
                   -- output data
@@ -193,6 +213,10 @@ begin
                   tilePrio    <= spriteSettings(spriteActiveCnt).Scr2Prio;
                   tilePalette <= '1' & spriteSettings(spriteActiveCnt).palette;
                   tileColor   <= spriteSettings(spriteActiveCnt).tileColor;
+                  
+                  tileActive2  <= spriteActiveOn2;
+                  tilePalette2 <= '1' & spriteSettings(spriteActiveCnt2).palette;
+                  tileColor2   <= spriteSettings(spriteActiveCnt2).tileColor;
             
             end if;
    
