@@ -256,7 +256,7 @@ begin
    
    gREG_Palette : for i in 0 to 31 generate 
    begin
-      iREG_Palette : entity work.eReg generic map ( REG_Palette, i ) port map (clk, RegBus_Din, RegBus_Adr, RegBus_wren, RegBus_rst, reg_wired_or(29 + i), Palette(i), Palette(i));  
+      iREG_Palette : entity work.eReg generic map ( REG_Palette, i ) port map (clk, RegBus_Din, RegBus_Adr, RegBus_wren, RegBus_rst, reg_wired_or(29 + i), '0' & Palette(i)(6 downto 4) & '0' & Palette(i)(2 downto 0), Palette(i));  
    end generate;
    
    iTMR_CTRL    : entity work.eReg generic map ( REG_TMR_CTRL     ) port map (clk, RegBus_Din, RegBus_Adr, RegBus_wren, RegBus_rst, reg_wired_or(61), TMR_CTRL              , open                  , TMR_CTRL_written   ); 
