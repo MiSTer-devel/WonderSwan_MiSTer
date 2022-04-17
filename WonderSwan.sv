@@ -40,6 +40,7 @@ module emu
 	output        CE_PIXEL,
 
 	//Video aspect ratio for HDMI. Most retro systems have ratio 4:3.
+	//if VIDEO_ARX[12] or VIDEO_ARY[12] is set then [11:0] contains scaled size instead of aspect ratio.
 	output [12:0] VIDEO_ARX,
 	output [12:0] VIDEO_ARY,
 
@@ -52,7 +53,7 @@ module emu
 	output        VGA_F1,
 	output [1:0]  VGA_SL,
 	output        VGA_SCALER, // Force VGA scaler
-	
+
 	input  [11:0] HDMI_WIDTH,
 	input  [11:0] HDMI_HEIGHT,
 	output        HDMI_FREEZE,
@@ -143,6 +144,7 @@ module emu
 
 `ifdef MISTER_DUAL_SDRAM
 	//Secondary SDRAM
+	//Set all output SDRAM_* signals to Z ASAP if SDRAM2_EN is 0
 	input         SDRAM2_EN,
 	output        SDRAM2_CLK,
 	output [12:0] SDRAM2_A,
@@ -215,23 +217,27 @@ localparam CONF_STR = {
 	"-;",
 	"OAB,Orientation,Horz,Vert,Vert180,Auto;",
 	"OC,Flipped Horz,Off,On;",
-	"OGJ,CRT H-Sync Adjust,0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,-2,-1;",
-	"OKN,CRT V-Sync Adjust,0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,-2,-1;",
-	"ODE,Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
-	"O24,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
-	"o23,Scale,Normal,V-Integer,Narrower HV-Integer,Wider HV-Integer;",
 	"-;",
-	"oC,Refresh Rate,60Hz,75Hz;",
-	"OO,Sync core to Video,Off,On;",
-	"O5,Buffer video,Off,On;",
-	"OUV,Flickerblend,Off,2 Frames,3 Frames;",
-	"-;",
-	"O78,Stereo mix,none,25%,50%,100%;",
-	"OP,FastForward Sound,On,Off;",
-	"-;",
-	"O9,CPU Turbo,Off,On;",
-	"OQ,Pause when OSD is open,Off,On;",
-	"OR,Rewind Capture,Off,On;",
+	"P1,Audio & Video;",
+	"P1-;",
+	"P1OGJ,CRT H-Sync Adjust,0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,-2,-1;",
+	"P1OKN,CRT V-Sync Adjust,0,1,2,3,4,5,6,7,-8,-7,-6,-5,-4,-3,-2,-1;",
+	"P1ODE,Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
+	"P1O24,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%,CRT 75%;",
+	"P1o23,Scale,Normal,V-Integer,Narrower HV-Integer,Wider HV-Integer;",
+	"P1-;",
+	"P1oC,Refresh Rate,60Hz,75Hz;",
+	"P1OO,Sync core to Video,Off,On;",
+	"P1O5,Buffer video,Off,On;",
+	"P1OUV,Flickerblend,Off,2 Frames,3 Frames;",
+	"P1-;",
+	"P1O78,Stereo mix,none,25%,50%,100%;",
+	"P1OP,FastForward Sound,On,Off;",
+	"P2,Miscellaneous;",
+	"P2-;",
+	"P2O9,CPU Turbo,Off,On;",
+	"P2OQ,Pause when OSD is open,Off,On;",
+	"P2OR,Rewind Capture,Off,On;",
 	"-;",
 	"R0,Reset;",
 	"J1,A,B,Start,Y2/Right,Y4/Left,Y3/DOWN,Y1/UP,FastForward,Savestates,Rewind;",
