@@ -229,7 +229,7 @@ localparam CONF_STR = {
 	"P1o23,Scale,Normal,V-Integer,Narrower HV-Integer,Wider HV-Integer;",
 	"P1-;",
 	"P1oC,Refresh Rate,60Hz,75Hz;",
-	"P1oD,H Freq (Composite),15.3kHz,15.72kHz;",
+	"P1oD,Video Timing for YC,Off,On;",
 	"P1OO,Sync core to Video,Off,On;",
 	"P1O5,Buffer video,Off,On;",
 	"P1OUV,Flickerblend,Off,2 Frames,3 Frames;",
@@ -767,7 +767,7 @@ always @(posedge CLK_VIDEO) begin
       end
 
 		x <= x + 1'd1;
-		if ((x >= HDisplayHFreqMode && ~status[44]) || (x >= 378 && status[44])) begin
+		if ((x >= HDisplayHFreqMode && ~status[44]) || (x >= 378 && status[44])) begin // (401x258 for standard video, 391x262 for improved Analog Timing for Composite)
 			x <= 0;
 			if (~&y) y <= y + 1'd1;
 			if (y >= VDisplayHFreqMode) begin
@@ -779,8 +779,8 @@ always @(posedge CLK_VIDEO) begin
             VShift      <= status[23:20] - VShiftHFreqMode;
 			HShiftHFreqMode <= (status[45] ? 4'd10 : 4'd0);
 			VShiftHFreqMode <= (status[45] ? 4'd4 : 4'd0);
-			HDisplayHFreqMode <= (status[45] ? 10'd390 : 10'd400);
-			VDisplayHFreqMode <= (status[45] ? 9'd261 : 9'd257);
+			HDisplayHFreqMode <= (status[45] ? 10'd390 : 10'd400); // Change Video Timing for for Y/C Composite Video
+			VDisplayHFreqMode <= (status[45] ? 9'd261 : 9'd257); // Change Video Timing for for Y/C Composite Video
 
             if (status[11:10] == 0) videomode = 0;                      // 224*144
             if (status[11:10] == 1) videomode = 1;                      // 144*224
