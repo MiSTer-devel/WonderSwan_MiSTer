@@ -229,6 +229,7 @@ localparam CONF_STR = {
 	"P1o23,Scale,Normal,V-Integer,Narrower HV-Integer,Wider HV-Integer;",
 	"P1-;",
 	"P1oC,Refresh Rate,60Hz,75Hz;",
+	"P1oD,Video Timing for YC,Off,On;",
 	"P1OO,Sync core to Video,Off,On;",
 	"P1O5,Buffer video,Off,On;",
 	"P1OUV,Flickerblend,Off,2 Frames,3 Frames;",
@@ -345,6 +346,7 @@ hps_io #(.CONF_STR(CONF_STR), .WIDE(1)) hps_io
 	.direct_video(direct_video),
 	.gamma_bus(gamma_bus),
 	.forced_scandoubler(forced_scandoubler),
+    .new_vmode(new_vmode),
 
 	.joystick_0(joy0_unmod),
 	.joystick_1(joystick_1),
@@ -673,6 +675,20 @@ reg [8:0] x,y;
 reg [2:0] div;
 reg signed [3:0] HShift;
 reg signed [3:0] VShift; 
+reg [9:0] HDisplayHFreqMode; 
+reg [8:0] VDisplayHFreqMode;
+reg signed [3:0] HShiftHFreqMode;
+reg signed [3:0] VShiftHFreqMode;  
+
+// If video timing changes, force mode update
+reg [1:0] video_status;
+reg new_vmode = 0;
+always @(posedge clk_sys) begin
+    if (video_status != status[45]) begin
+        video_status <= status[45];
+        new_vmode <= ~new_vmode;
+    end
+end
 
 always @(posedge CLK_VIDEO) begin
 
@@ -751,16 +767,21 @@ always @(posedge CLK_VIDEO) begin
       end
 
 		x <= x + 1'd1;
-		if ((x >= 400 && ~status[44]) || (x >= 378 && status[44])) begin
+		if ((x >= HDisplayHFreqMode && ~status[44]) || (x >= 378 && status[44])) begin // (401x258 for standard video, 391x262 for improved Analog Timing for Composite)
 			x <= 0;
 			if (~&y) y <= y + 1'd1;
-			if (y >= 257) begin
+			if (y >= VDisplayHFreqMode) begin
             y              <= 0;
             buffercnt_read <= buffercnt_readnext;
             buffercnt_last <= buffercnt_read;
             
-            HShift      <= status[19:16];
-            VShift      <= status[23:20];
+            HShift      <= status[19:16] + HShiftHFreqMode;
+            VShift      <= status[23:20] - VShiftHFreqMode;
+			HShiftHFreqMode <= (status[45] ? 4'd10 : 4'd0);
+			VShiftHFreqMode <= (status[45] ? 4'd4 : 4'd0);
+			HDisplayHFreqMode <= (status[45] ? 10'd390 : 10'd400); // Change Video Timing for for Y/C Composite Video
+			VDisplayHFreqMode <= (status[45] ? 9'd261 : 9'd257); // Change Video Timing for for Y/C Composite Video
+
             if (status[11:10] == 0) videomode = 0;                      // 224*144
             if (status[11:10] == 1) videomode = 1;                      // 144*224
             if (status[11:10] == 2) videomode = 2;                      // 144*224, 180 degree rotated
