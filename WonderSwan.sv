@@ -199,7 +199,7 @@ assign AUDIO_MIX = status[8:7];
 // 0         1         2         3          4         5         6
 // 01234567890123456789012345678901 23456789012345678901234567890123
 // 0123456789ABCDEFGHIJKLMNOPQRSTUV 0123456789ABCDEFGHIJKLMNOPQRSTUV
-// xxxxxxxxxxxxxxx xxxxxxxxxxxxxxxx   xxxxxxxxxxxx
+// xxxxxxxxxxxxxxx xxxxxxxxxxxxxxxx   xxxxxxxxxxxxx
 
 `include "build_id.v" 
 localparam CONF_STR = {
@@ -213,7 +213,7 @@ localparam CONF_STR = {
 	"d0oB,Autosave,Off,On;",
 	"-;",
 	"o4,Savestates to SDCard,On,Off;",
-	"o45,Autoincrement Slot,Off,On;",
+	"oE,Autoincrement Slot,Off,On;",
 	"o56,Savestate Slot,1,2,3,4;",
 	"h0RS,Save state (Alt-F1);",
 	"h0RT,Restore state (F1);",
@@ -916,7 +916,7 @@ savestate_ui savestate_ui
 	.joyRewind      (joy0_unmod[13]),
 	.rewindEnable   (status[27]    ),
 	.status_slot    (status[38:37] ),
-	.autoincslot    (status[45]    ),
+	.autoincslot    (status[46]    ),
 	.OSD_saveload   (status[29:28] ),
 	.ss_save        (ss_save       ),
 	.ss_load        (ss_load       ),
