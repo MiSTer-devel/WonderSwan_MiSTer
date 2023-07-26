@@ -199,7 +199,7 @@ assign AUDIO_MIX = status[8:7];
 // 0         1         2         3          4         5         6
 // 01234567890123456789012345678901 23456789012345678901234567890123
 // 0123456789ABCDEFGHIJKLMNOPQRSTUV 0123456789ABCDEFGHIJKLMNOPQRSTUV
-// xxxxxxxxxxxxxxx xxxxxxxxxxxxxxxx   xxxxxxxxxxx
+// xxxxxxxxxxxxxxx xxxxxxxxxxxxxxxx   xxxxxxxxxxxx
 
 `include "build_id.v" 
 localparam CONF_STR = {
@@ -213,6 +213,7 @@ localparam CONF_STR = {
 	"d0oB,Autosave,Off,On;",
 	"-;",
 	"o4,Savestates to SDCard,On,Off;",
+	"o45,Autoincrement Slot,Off,On;",
 	"o56,Savestate Slot,1,2,3,4;",
 	"h0RS,Save state (Alt-F1);",
 	"h0RT,Restore state (F1);",
@@ -245,7 +246,7 @@ localparam CONF_STR = {
 	"R0,Reset;",
 	"J1,A,B,Start,Y2/Right,Y4/Left,Y3/DOWN,Y1/UP,FastForward,Savestates,Rewind;",
 	"I,",
-	"Slot=DPAD|Save/Load=Start+DPAD,",
+	"Load=DPAD Up|Save=Down|Slot=L+R,",
 	"Active Slot 1,",
 	"Active Slot 2,",
 	"Active Slot 3,",
@@ -324,12 +325,12 @@ hps_io #(.CONF_STR(CONF_STR), .WIDE(1)) hps_io
 	.ioctl_dout(ioctl_dout),
 	.ioctl_wait(ioctl_wait),
 	.ioctl_index(filetype),
-	
+
 	.status(status),
 	.status_menumask(cart_ready),
-	.status_in({status[63:39],ss_slot,status[36:0]}),
+	.status_in({status[63:39], ss_slot, status[36:30], 2'b00, status[27:0]}),
 	.status_set(statusUpdate),
-	
+
 	.sd_lba('{sd_lba}),
 	.sd_rd(sd_rd),
 	.sd_wr(sd_wr),
@@ -913,8 +914,9 @@ savestate_ui savestate_ui
 	.joyUp          (joy0_unmod[3] ),
 	.joyStart       (joy0_unmod[6] ),
 	.joyRewind      (joy0_unmod[13]),
-	.rewindEnable   (status[27]    ), 
+	.rewindEnable   (status[27]    ),
 	.status_slot    (status[38:37] ),
+	.autoincslot    (status[45]    ),
 	.OSD_saveload   (status[29:28] ),
 	.ss_save        (ss_save       ),
 	.ss_load        (ss_load       ),
